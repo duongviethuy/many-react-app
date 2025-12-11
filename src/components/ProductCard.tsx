@@ -1,6 +1,7 @@
 "use client";
 
 import Product from "@/app/types/productModel";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
     product: Product;
@@ -11,6 +12,7 @@ export default function ProductCard({
     product,
     onAddToCart,
 }: ProductCardProps) {
+    const { handleAddToCard } = useCart();
     return (
         <div className="flex flex-col space-y-3 bg-blue-50 items-center rounded-md py-4">
             <img
@@ -26,7 +28,7 @@ export default function ProductCard({
             <button
                 className="bg-blue-500 text-white p-2 rounded-xl hover:bg-blue-700 transition-all cursor-pointer"
                 type="button"
-                onClick={() => onAddToCart(product)}
+                onClick={() => handleAddToCard(product)}
             >
                 Add to cart
             </button>

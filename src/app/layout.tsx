@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata: Metadata = {
     title: "SIMPLE SHOPPING APP",
@@ -15,9 +16,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="vi">
-            <Header />
-            <body className="">{children}</body>
-            <Footer />
+            <body className="">
+                <CartProvider>
+                    <Header />
+                    {children}
+                    <Footer />
+                </CartProvider>
+            </body>
         </html>
     );
 }
