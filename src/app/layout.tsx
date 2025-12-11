@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/Header";
+
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata: Metadata = {
     title: "TO DO APP",
@@ -13,7 +16,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="vi">
-            <body className={`antialiased`}>{children}</body>
+            <body className={`antialiased`}>
+                <CartProvider>
+                    <Header />
+                    {children}
+                </CartProvider>
+            </body>
         </html>
     );
 }
