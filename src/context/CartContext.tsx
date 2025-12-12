@@ -18,7 +18,9 @@ interface CartContextType {
     cartItems: CartItem[];
     totalProducts: number;
     totalPrices: number;
-    handleAddToCard: (product: Product) => void;
+    handleAddToCart: (product: Product) => void;
+    handleUpdateQuantity: (id: string, type: "increase" | "descrease") => void;
+    handleDeleteItem: (id: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -36,20 +38,38 @@ interface CardProviderProps {
 export const CartProvider = ({ children }: CardProviderProps) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-    const handleAddToCard = useCallback((product: Product) => {
-        const existedItem = cartItems.find((item) => item.id === product.id);
-        if (existedItem) {
-            setCartItems((prevs) => {
+    const handleAddToCart = useCallback((product: Product) => {
+        setCartItems((prevs) => {
+            const existingItem = prevs.find((item) => item.id === product.id);
+            if (existingItem)
                 return prevs.map((item) =>
                     item.id === product.id
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
+            else return [...prevs, { ...product, quantity: 1 }];
+        });
+    }, []);
+
+    const handleUpdateQuantity = useCallback(
+        (id: string, type: "increase" | "descrease") => {
+            setCartItems((prevs) => {
+                return prevs
+                    .map((item) => {
+                        if (item.id === id)
+                            return type === "increase"
+                                ? { ...item, quantity: item.quantity + 1 }
+                                : { ...item, quantity: item.quantity - 1 };
+                        else return item;
+                    })
+                    .filter((item) => item.quantity > 0);
             });
-        } else {
-            setCartItems((prevs) => [...prevs, { ...product, quantity: 1 }]);
-        }
-        alert(`Thêm thành công ${product.name}`);
+        },
+        []
+    );
+
+    const handleDeleteItem = useCallback((id: string) => {
+        setCartItems((prevs) => prevs.filter((item) => item.id !== id));
     }, []);
 
     const { totalProducts, totalPrices } = useMemo(() => {
@@ -66,8 +86,22 @@ export const CartProvider = ({ children }: CardProviderProps) => {
     }, [cartItems]);
 
     const contextValue: CartContextType = useMemo(() => {
-        return { cartItems, totalProducts, totalPrices, handleAddToCard };
-    }, [cartItems, totalProducts, totalPrices, handleAddToCard]);
+        return {
+            cartItems,
+            totalProducts,
+            totalPrices,
+            handleAddToCart,
+            handleUpdateQuantity,
+            handleDeleteItem,
+        };
+    }, [
+        cartItems,
+        totalProducts,
+        totalPrices,
+        handleAddToCart,
+        handleUpdateQuantity,
+        handleDeleteItem,
+    ]);
     return (
         <CartContext.Provider value={contextValue}>
             {children}
